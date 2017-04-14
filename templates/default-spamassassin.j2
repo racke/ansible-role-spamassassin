@@ -1,0 +1,30 @@
+# {{ansible_managed}}
+
+# If you're using systemd (default for jessie), the ENABLED setting is
+# not used. Instead, enable spamd by issuing:
+# systemctl enable spamassassin.service
+# Change to "1" to enable spamd on systems using sysvinit:
+ENABLED={{spamassassin_default_enabled}}
+
+# Options
+# See man spamd for possible options. The -d option is automatically added.
+
+# SpamAssassin uses a preforking model, so be careful! You need to
+# make sure --max-children is not set to anything higher than 5,
+# unless you know what you're doing.
+
+OPTIONS="{{spamassassin_default_options}}"
+
+# Pid file
+# Where should spamd write its PID to file? If you use the -u or
+# --username option above, this needs to be writable by that user.
+# Otherwise, the init script will not be able to shut spamd down.
+PIDFILE="/var/run/spamd.pid"
+
+# Set nice level of spamd
+NICE="{{spamassassin_default_nice}}"
+
+# Cronjob
+# Set to anything but 0 to enable the cron job to automatically update
+# spamassassin's rules on a nightly basis
+CRON={{spamassassin_default_cron}}

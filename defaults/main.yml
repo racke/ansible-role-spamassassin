@@ -1,0 +1,27 @@
+---
+
+spamassassin_packages:
+  - spamassassin
+  - spamc
+  - libgeo-ip-perl
+  - pyzor
+  - razor
+
+spamassassin_default_template: "default-spamassassin.j2"
+spamassassin_default_enabled: 1
+spamassassin_default_options: "--create-prefs --max-children 5 --helper-home-dir"
+spamassassin_default_nice: ""
+# spamassassin_default_nice: "--nicelevel 15"
+spamassassin_default_cron: 1
+
+spamassassin_localcf_template: "local.cf.j2"
+
+# Plugins
+spamassassin_plugins_enable:
+  - RelayCountry
+  - Pyzor
+  - Razor2
+
+spamassassin_plugins_disable:
+  - DCC
+

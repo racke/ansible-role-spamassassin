@@ -1,0 +1,84 @@
+---
+
+- name: Spamassassin | Install packages
+  apt:
+    name: "{{item}}"
+    state: present
+  with_items: "{{spamassassin_packages}}"
+
+- name: Spamassassin | Configure defaults
+  template:
+    src: "{{spamassassin_default_template}}"
+    dest: /etc/default/spamassassin
+  notify: Restart spamassassin
+
+- name: Spamassassin | Set local.cf
+  template:
+    src: "{{spamassassin_localcf_template}}"
+    dest: /etc/spamassassin/local.cf
+    backup: yes
+  notify: Restart spamassassin
+
+######################################################################
+# Plugins
+
+- name: Spamassassin | Enable plugins
+  lineinfile:
+    dest: /etc/spamassassin/init.pre
+    create: yes
+    regexp: '^#?\s*loadplugin Mail::SpamAssassin::Plugin::{{item}}'
+    line: "loadplugin Mail::SpamAssassin::Plugin::{{item}}"
+  with_items: "{{spamassassin_plugins_enable}}"
+  notify: Restart spamassassin
+
+- name: Spamassassin | Disable plugins - Find .pre files
+  find:
+    paths: /etc/spamassassin
+    patterns: "*.pre"
+  register: files_with_plugins
+
+- name: Spamassassin | Disable plugins in .pre files
+  lineinfile:
+    dest: "{{item[0].path}}"
+    regexp: '^\s*(loadplugin Mail::SpamAssassin::Plugin::{{item[1]}})'
+    backrefs: yes
+    line: '#\1'
+  with_nested:
+    - "{{files_with_plugins.files}}"
+    - "{{spamassassin_plugins_disable}}"
+  notify: Restart spamassassin
+
+######################################################################
+
+- name: Spamassassin | Initialize Pyzor
+  become_user: debian-spamd
+  command: pyzor discover
+  args:
+    creates: /var/lib/spamassassin/.pyzor/servers
+  when: "'pyzor' in spamassassin_packages"
+  notify: Restart spamassassin
+
+- name: Spamassassin | Initialize Razor
+  become_user: debian-spamd
+  command: razor-admin -home=/var/lib/spamassassin/.razor -create
+  args:
+    creates: /var/lib/spamassassin/.razor/razor-agent.conf
+  when: "'razor' in spamassassin_packages"
+  notify: Restart spamassassin
+
+- name: Spamassassin | Register Razor
+  become_user: debian-spamd
+  command: razor-admin -home=/var/lib/spamassassin/.razor -register
+  args:
+    creates: /var/lib/spamassassin/.razor/identity
+  when: "'razor' in spamassassin_packages"
+  notify: Restart spamassassin
+
+######################################################################
+
+- name: Spamassassin | Enable spamd at boot
+  service:
+    name: spamassassin
+    enabled: yes
+  when: spamassassin_default_enabled == 1
+
