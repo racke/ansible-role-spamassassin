@@ -10,14 +10,18 @@
   template:
     src: "{{spamassassin_default_template}}"
     dest: /etc/default/spamassassin
-  notify: Restart spamassassin
+  notify:
+    - Check spamassassin conf
+    - Restart spamassassin
 
 - name: Spamassassin | Set local.cf
   template:
     src: "{{spamassassin_localcf_template}}"
     dest: /etc/spamassassin/local.cf
     backup: yes
-  notify: Restart spamassassin
+  notify:
+    - Check spamassassin conf
+    - Restart spamassassin
 
 ######################################################################
 # Plugins
@@ -29,7 +33,9 @@
     regexp: '^#?\s*loadplugin Mail::SpamAssassin::Plugin::{{item}}'
     line: "loadplugin Mail::SpamAssassin::Plugin::{{item}}"
   with_items: "{{spamassassin_plugins_enable}}"
-  notify: Restart spamassassin
+  notify:
+    - Check spamassassin conf
+    - Restart spamassassin
 
 - name: Spamassassin | Disable plugins - Find .pre files
   find:
@@ -46,7 +52,9 @@
   with_nested:
     - "{{files_with_plugins.files}}"
     - "{{spamassassin_plugins_disable}}"
-  notify: Restart spamassassin
+  notify:
+    - Check spamassassin conf
+    - Restart spamassassin
 
 ######################################################################
 
@@ -56,7 +64,9 @@
   args:
     creates: /var/lib/spamassassin/.pyzor/servers
   when: "'pyzor' in spamassassin_packages"
-  notify: Restart spamassassin
+  notify:
+    - Check spamassassin conf
+    - Restart spamassassin
 
 - name: Spamassassin | Initialize Razor
   become_user: debian-spamd
@@ -64,7 +74,9 @@
   args:
     creates: /var/lib/spamassassin/.razor/razor-agent.conf
   when: "'razor' in spamassassin_packages"
-  notify: Restart spamassassin
+  notify:
+    - Check spamassassin conf
+    - Restart spamassassin
 
 - name: Spamassassin | Register Razor
   become_user: debian-spamd
@@ -72,7 +84,9 @@
   args:
     creates: /var/lib/spamassassin/.razor/identity
   when: "'razor' in spamassassin_packages"
-  notify: Restart spamassassin
+  notify:
+    - Check spamassassin conf
+    - Restart spamassassin
 
 ######################################################################
 

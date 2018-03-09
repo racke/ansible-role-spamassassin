@@ -1,4 +1,8 @@
 ---
+- name: Check spamassassin conf
+  command: spamassassin --lint
+  changed_when: no
+
 - name: Restart spamassassin
   service:
     name: spamassassin
