@@ -78,6 +78,24 @@
     - Check spamassassin conf
     - Restart spamassassin
 
+- name: Spamassassin | Rotate Razor logs 
+  copy:
+    dest: /etc/logrotate.d/razor_spamassassin
+    content: |
+      /var/lib/spamassassin/.razor/razor-agent.log {
+        weekly
+        rotate 3
+        compress
+        nomail
+        notifempty
+        missingok
+        create 644 debian-spamd debian-spamd
+      }
+  when: "'razor' in spamassassin_packages"
+  notify:
+    - Check spamassassin conf
+    - Restart spamassassin
+
 - name: Spamassassin | Register Razor
   become_user: debian-spamd
   command: razor-admin -home=/var/lib/spamassassin/.razor -register
