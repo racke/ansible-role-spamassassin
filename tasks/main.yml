@@ -110,7 +110,7 @@
 
 - name: Spamassassin | Enable spamd at boot
   service:
-    name: spamassassin
+    name: spamd
     enabled: yes
   when: spamassassin_default_enabled == 1
 
