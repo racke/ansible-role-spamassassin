@@ -6,6 +6,7 @@ spamassassin_packages:
   - libgeo-ip-perl
   - pyzor
   - razor
+spamassassin_service: spamd
 
 spamassassin_default_template: "default-spamassassin.j2"
 spamassassin_default_enabled: 1
