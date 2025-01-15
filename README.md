@@ -2,7 +2,7 @@ Spamassassin
 ============
 
 An Ansible role to install and configure
-[Spamassassin](http://spamassassin.apache.org/) antispam filter.
+[Spamassassin](https://spamassassin.apache.org/) antispam filter.
 
 Role Variables
 --------------
