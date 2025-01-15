@@ -14,7 +14,7 @@ Example Playbook
 
     - hosts: servers
       roles:
-        - mathieumd.spamassassin
+        - racke.spamassassin
 
 License
 -------
